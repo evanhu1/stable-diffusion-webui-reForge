@@ -210,6 +210,8 @@ class ControlNetForForgeOfficial(scripts.Script):
             a1111_i2i_mask = getattr(p, "image_mask", None)
 
             using_a1111_data = False
+            
+            unit_image = np.array(decode_base64_to_image(unit.image['image'])).astype('uint8')
 
             if unit.use_preview_as_input and unit.generated_image is not None:
                 image = unit.generated_image
@@ -217,10 +219,8 @@ class ControlNetForForgeOfficial(scripts.Script):
                 resize_mode = external_code.resize_mode_from_value(p.resize_mode)
                 image = HWC3(np.asarray(a1111_i2i_image))
                 using_a1111_data = True
-            elif (unit.image['image'] < 5).all() and (unit.image['mask'] > 5).any():
-                image = unit.image['mask']
             else:
-                image = unit.image['image']
+                image = unit_image
 
             if not isinstance(image, np.ndarray):
                 raise ValueError("controlnet is enabled but no input image is given")
@@ -233,8 +233,6 @@ class ControlNetForForgeOfficial(scripts.Script):
                 mask = unit.mask_image['image']
             elif unit.mask_image is not None and (unit.mask_image['mask'] > 5).any():
                 mask = unit.mask_image['mask']
-            elif unit.image is not None and (unit.image['mask'] > 5).any():
-                mask = unit.image['mask']
             else:
                 mask = None
 
@@ -320,6 +318,21 @@ class ControlNetForForgeOfficial(scripts.Script):
             return tqdm(iterable) if use_tqdm else iterable
 
         for input_image, input_mask in optional_tqdm(input_list, len(input_list) > 1):
+            # Outpaint fix for ControlNet inpaint.
+            # Outpaint should have the expanded outpaint area masked.
+            if resize_mode == external_code.ResizeMode.OUTER_FIT and "Inpaint" in preprocessor.tags:
+                if input_mask is None:
+                    input_mask = np.zeros_like(input_image)
+                input_mask = crop_and_resize_image(
+                    input_mask,
+                    external_code.ResizeMode.OUTER_FIT, h, w,
+                    fill_border_with_255=True,
+                )
+                input_image = crop_and_resize_image(
+                    input_image,
+                    external_code.ResizeMode.OUTER_FIT, h, w,
+                    fill_border_with_255=False,
+                )
             if unit.pixel_perfect:
                 unit.processor_res = external_code.pixel_perfect_resolution(
                     input_image,

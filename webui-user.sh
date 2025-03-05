@@ -10,7 +10,8 @@
 #clone_dir="stable-diffusion-webui"
 
 # Commandline arguments for webui.py, for example: export COMMANDLINE_ARGS="--medvram --opt-split-attention"
-#export COMMANDLINE_ARGS=""
+# export COMMANDLINE_ARGS="--listen --no-gradio-queue --xformers --enable-insecure-extension-access --skip-torch-cuda-test --api --port 7890 --autolaunch"
+export COMMANDLINE_ARGS="--xformers --port 7890 --listen --api --enable-insecure-extension-access"
 
 # python3 executable
 #python_cmd="python3"
@@ -40,7 +41,7 @@
 #export BLIP_COMMIT_HASH=""
 
 # Uncomment to enable accelerated launch
-#export ACCELERATE="True"
+# export ACCELERATE="True"
 
 # Uncomment to disable TCMalloc
 #export NO_TCMALLOC="True"
