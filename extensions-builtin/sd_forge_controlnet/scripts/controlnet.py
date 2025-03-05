@@ -210,6 +210,8 @@ class ControlNetForForgeOfficial(scripts.Script):
             a1111_i2i_mask = getattr(p, "image_mask", None)
 
             using_a1111_data = False
+            
+            unit_image = np.array(decode_base64_to_image(unit.image['image'])).astype('uint8')
 
             if unit.use_preview_as_input and unit.generated_image is not None:
                 image = unit.generated_image
@@ -217,10 +219,8 @@ class ControlNetForForgeOfficial(scripts.Script):
                 resize_mode = external_code.resize_mode_from_value(p.resize_mode)
                 image = HWC3(np.asarray(a1111_i2i_image))
                 using_a1111_data = True
-            elif (unit.image['image'] < 5).all() and (unit.image['mask'] > 5).any():
-                image = unit.image['mask']
             else:
-                image = unit.image['image']
+                image = unit_image
 
             if not isinstance(image, np.ndarray):
                 raise ValueError("controlnet is enabled but no input image is given")
@@ -233,8 +233,6 @@ class ControlNetForForgeOfficial(scripts.Script):
                 mask = unit.mask_image['image']
             elif unit.mask_image is not None and (unit.mask_image['mask'] > 5).any():
                 mask = unit.mask_image['mask']
-            elif unit.image is not None and (unit.image['mask'] > 5).any():
-                mask = unit.image['mask']
             else:
                 mask = None
 
