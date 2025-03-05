@@ -2,6 +2,14 @@
 
 ## Setup
 
+### Get all resources from S3
+
+```bash
+sudo aws s3 sync s3://infradeps/auto1111/ ./
+```
+
+### Alternatively
+
 For face id ip adaptor need lora ip-adapter-faceid-plusv2_sd15_lora.safetensors
 
 ```bash
