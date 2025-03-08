@@ -373,7 +373,10 @@ def try_unfold_unit(unit: ControlNetUnit) -> List[ControlNetUnit]:
 
     def extract_unit(gallery_item: dict) -> ControlNetUnit:
         r_unit = copy(unit)
-        img = np.array(api.decode_base64_to_image(read_image(gallery_item["name"]))).astype('uint8')
+        if gallery_item["is_file"]:
+            img = np.array(api.decode_base64_to_image(read_image(gallery_item["data"]))).astype('uint8')
+        else:
+            img = np.array(api.decode_base64_to_image(gallery_item["data"])).astype('uint8')
         r_unit.image = {
             "image": img,
             "mask": np.zeros_like(img),

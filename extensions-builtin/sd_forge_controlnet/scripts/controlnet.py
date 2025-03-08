@@ -211,7 +211,10 @@ class ControlNetForForgeOfficial(scripts.Script):
 
             using_a1111_data = False
             
-            unit_image = np.array(decode_base64_to_image(unit.image['image'])).astype('uint8')
+            if not isinstance(unit.image['image'], np.ndarray):
+                unit_image = np.array(decode_base64_to_image(unit.image['image'])).astype('uint8')
+            else:
+                unit_image = unit.image['image']
 
             if unit.use_preview_as_input and unit.generated_image is not None:
                 image = unit.generated_image
