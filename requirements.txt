@@ -32,3 +32,4 @@ torchdiffeq
 torchsde
 transformers==4.44.0
 pillow-avif-plugin==1.4.3
+insightface
